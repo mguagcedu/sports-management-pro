@@ -1,54 +1,30 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
+import { oauthConfig } from "../oauth-config";
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("streamlist_auth");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.isAuthenticated) {
-          setIsAuthenticated(true);
-          setUser(parsed.user || { name: "Demo User" });
-        }
-      } catch {
-        // ignore
-      }
-    }
+    const saved = localStorage.getItem("streamlistUser");
+    if (saved) setUser(JSON.parse(saved));
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem(
-      "streamlist_auth",
-      JSON.stringify({ isAuthenticated, user })
-    );
-  }, [isAuthenticated, user]);
-
-  const signInDemo = () => {
-    setIsAuthenticated(true);
-    setUser({ name: "Demo User" });
+  const loginUser = (token) => {
+    const userData = { token };
+    setUser(userData);
+    localStorage.setItem("streamlistUser", JSON.stringify(userData));
   };
 
-  const signOut = () => {
-    setIsAuthenticated(false);
+  const logoutUser = () => {
     setUser(null);
-    localStorage.removeItem("streamlist_auth");
+    localStorage.removeItem("streamlistUser");
   };
 
-  const value = {
-    isAuthenticated,
-    user,
-    signInDemo,
-    signOut,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  return useContext(AuthContext);
+  return (
+    <AuthContext.Provider value={{ user, loginUser, logoutUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }

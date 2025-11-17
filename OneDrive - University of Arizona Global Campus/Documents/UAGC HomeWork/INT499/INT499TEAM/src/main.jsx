@@ -1,3 +1,6 @@
+import LoginPage from "./pages/LoginPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./context/AuthContext";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
